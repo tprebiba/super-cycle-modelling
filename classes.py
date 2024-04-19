@@ -9,16 +9,23 @@ class Cycle():
     '''
     A simple cycle representation
     Inputs:
-        accelerator [str]: accelerator name
-        name [str]: cycle name
-        bps [int]: number of basic periods
-        user [str] (optional): user name
-        power [float] (optional): cycle power [MW]
-        filename [str] (optional): I mains csv file name
+        - accelerator [str]: accelerator name
+        - name [str]: cycle name
+        - bps [int]: number of basic periods
+        - user [str] (optional): LSA timing user name
+        - power [float] (optional): cycle power [MW]
+        - filename [str] (optional): I mains csv file name
+        - coupled_cycle [Cycle]: coupled cyc
+        - number_of_injections [int] (optional): number of injections
+    Other class variables:
+        - length [float]: cycle length [sec]
+        - x [list]: I mains x values
+        - y [list]: I mains y values
     '''
     def __init__(self,
                  accelerator, name, bps,
-                 user='', power=0, filename=None, coupled_cycle=None):
+                 user='', power=0, filename=None, 
+                 coupled_cycle=None, number_of_injections=1):
         
         self.accelerator = accelerator 
         self.name = name
@@ -26,6 +33,7 @@ class Cycle():
         self.user = user
         self.power = power 
         self.filename = filename
+        self.number_of_injections = number_of_injections
 
         self.length = self.bps*cnst.BASIC_PERIOD # [sec]        
         self.x = None
@@ -34,7 +42,7 @@ class Cycle():
             self.x, self.y = load_cycle_from_csv(filename)
         self.coupled_cycle = coupled_cycle
         if self.coupled_cycle:
-            self.coupled_cycle_bps = self.coupled_cycle.bps
+            self.coupled_cycle_bps = self.coupled_cycle.bps*self.number_of_injections
         else:
             self.coupled_cycle_bps = 0
     
@@ -43,9 +51,28 @@ class SuperCycle():
     '''
     A simple super cycle representation
     Inputs:
-        accelerator [str]: accelerator name
-        name [str]: cycle name
-        cycles [list]: list of cycles
+        - accelerator [str]: accelerator name
+        - name [str]: supercycle name
+        - cycles [list]: list of cycles in the supercycle
+    Other class variables:
+        - cycle_names [list]: list of cycle names in the supercycle
+        - bps [int]: number of basic periods of supercycle
+        - length [float]: supercycle length [sec]
+        - integrated_power [float]: integrated power [MW]
+        - average_power [float]: average power [MW]
+    Class methods:
+        calculate_supercycle_length: calculates supercycle length and bps
+        calculate_supercycle_power: calculates supercycle integrated and average power
+        allocate_hours: allocates hours to the supercycle assuming a machine availability
+            - allocated_hours [int]: allocated hours
+            - allocated_seconds [int]: allocated seconds
+            - allocated_bps [int]: allocated basic periods
+            - number_of_supercycles_played [int]: number of supercycles played in the allocated time
+            - number_of_cycles_played [dict]: number of times each cycle is played in the allocated time
+        calculate_free_bps: calculates free BPs of the injector
+            - free_bps_per_supercycle [int]: free BPs per supercycle
+            - free_bps_total [int]: total free BPs
+
     '''
     def __init__(self, accelerator, name, cycles):
         

@@ -31,17 +31,17 @@ PS_CYCLES = {
                  user='TOF'),
     'EAST': Cycle(accelerator='PS', name='EAST', bps=2,
                   user='EAST1'),
-    'MTE (2 injections)': Cycle(accelerator='PS', name='MTE', bps=1*2, # two injections into the SPS
+    'MTE': Cycle(accelerator='PS', name='MTE', bps=1,
                  user='SFTPRO1'),
-    'LHC (4 injections)': Cycle(accelerator='PS', name='LHC', bps=3*4, # four injections into the LHC
+    'LHC': Cycle(accelerator='PS', name='LHC', bps=3,
                  user='LHC1'),
     'AWAKE': Cycle(accelerator='PS', name='AWAKE', bps=2,
                    user='AWAKE1'),
     'LHC pilot': Cycle(accelerator='PS', name='LHC pilot', bps=2),
-    'MD dedicated': Cycle(accelerator='PS', name='MD dedicated', bps=3*4),
+    'MD dedicated': Cycle(accelerator='PS', name='MD dedicated', bps=3),
     'MD parallel': Cycle(accelerator='PS', name='MD parallel', bps=2),
-    'Scrubbing': Cycle(accelerator='PS', name='Scrubbing', bps=3*4),
-    'HiRadMat': Cycle(accelerator='PS', name='HiRadMat', bps=3*4),
+    'Scrubbing': Cycle(accelerator='PS', name='Scrubbing', bps=3),
+    'HiRadMat': Cycle(accelerator='PS', name='HiRadMat', bps=3),
                        
 }
 
@@ -52,29 +52,34 @@ PS_CYCLES = {
 SPS_AVAILABILITY = 0.8
 SPS_RMS_POWER_LIMIT = 41.1 # [MW]
 SPS_SC_LENGTH_LIMIT = 90 # [s]
-_source = '../01_protons_2021-2022_SPS/power_consumption_measurements/SPS_cycle_power_estimation/SPS_cycles_MBI_IMAINS/'
+_source = '../../01_protons_2021-2022_SPS/power_consumption_measurements/SPS_cycle_power_estimation/SPS_cycles_MBI_IMAINS/'
 SPS_CYCLES = {
     #--------------------------------------------------------
     # Typical operational cycles
     'AWAKE': Cycle(accelerator='SPS', name='AWAKE', bps=6,
                    user='AWAKE1', power=31.19,filename=_source+'AWAKE1_7point2s.csv', 
-                   coupled_cycle=PS_CYCLES['AWAKE']),
+                   coupled_cycle=PS_CYCLES['AWAKE'], number_of_injections=1),
     'HiRadMat': Cycle(accelerator='SPS', name='HiRadMat', bps=20,
-                      user='HIRADMT2', power=17.52,filename=_source+'HIRADMT2_24s.csv'),
+                      user='HIRADMT2', power=17.52,filename=_source+'HIRADMT2_24s.csv',
+                      coupled_cycle=PS_CYCLES['HiRadMat'], number_of_injections=4),
     'SFTPRO': Cycle(accelerator='SPS', name='SFTPRO', bps=9,
                     user='SFTPRO1',power=52.83,filename=_source+'SFTPRO1_10point8.csv', 
-                    coupled_cycle=PS_CYCLES['MTE (2 injections)']),
+                    coupled_cycle=PS_CYCLES['MTE'], number_of_injections=2),
     'LHC filling': Cycle(accelerator='SPS', name='LHC filling', bps=20,
                          user='LHC25NS',power=18.03,filename=_source+'LHC25NS_LHC_filling_24s.csv', 
-                         coupled_cycle=PS_CYCLES['LHC (4 injections)']),
+                         coupled_cycle=PS_CYCLES['LHC'], number_of_injections=4),
     'LHC pilot': Cycle(accelerator='SPS', name='LHC pilot', bps=11,
-                       user='LHCPILOT',power=32.5,filename=_source+'LHCPILOT_13point2s.csv'),
+                       user='LHCPILOT',power=32.5,filename=_source+'LHCPILOT_13point2s.csv',
+                       coupled_cycle=PS_CYCLES['LHC pilot'], number_of_injections=2),
     'MD dedicated': Cycle(accelerator='SPS', name='MD dedicated', bps=20,
-                          user='MD5',power=18.03,filename=_source+'LHC25NS_MD_dedicated_24s.csv'), # LHC25NS
+                          user='MD5',power=18.03,filename=_source+'LHC25NS_MD_dedicated_24s.csv',
+                          coupled_cycle=PS_CYCLES['MD dedicated'], number_of_injections=4), # LHC25NS
     'MD parallel': Cycle(accelerator='SPS', name='MD parallel', bps=6,
-                         user='MD5',power=2.81,filename=_source+'MD5_MD_parallel_7point2s.csv'),
+                         user='MD5',power=2.81,filename=_source+'MD5_MD_parallel_7point2s.csv',
+                         coupled_cycle=PS_CYCLES['MD parallel'], number_of_injections=1),
     'Scrubbing': Cycle(accelerator='SPS', name='Scrubbing', bps=20, 
-                       user='',power=18.03,filename=_source+'LHC25NS_Scrubbing_24s.csv'), # LHC25NS
+                       user='',power=18.03,filename=_source+'LHC25NS_Scrubbing_24s.csv',
+                       coupled_cycle=PS_CYCLES['Scrubbing'], number_of_injections=4), # LHC25NS
     'Zero': Cycle(accelerator='SPS', name='Zero', bps=1,
                   user='ZERO',power=1.2,filename=_source+'Zero_1point2s.csv'),
     'deGauss': Cycle(accelerator='SPS', name='deGauss', bps=3,
@@ -83,22 +88,22 @@ SPS_CYCLES = {
     # Future cycles
     'ECN3_D (1.2s)': Cycle(accelerator='SPS', name='ECN3_D (1.2s)', bps=6,#6,
                         user='',power=34.88,filename=_source+'SFTPRO1_7point2s_ESTIMATED.csv', # power estimation is correct?
-                        coupled_cycle=PS_CYCLES['MTE (2 injections)']), 
+                        coupled_cycle=PS_CYCLES['MTE'], number_of_injections=2), 
     'ECN3_D (2.4s)': Cycle(accelerator='SPS', name='ECN3_D (2.4s)', bps=7,
                         user='',power=44.84,filename=_source+'SFTPRO1_8point4s_ESTIMATED.csv', # power estimation should be overestimated a bit
-                        coupled_cycle=PS_CYCLES['MTE (2 injections)']), 
+                        coupled_cycle=PS_CYCLES['MTE'], number_of_injections=2), 
     'ECN3_D (4.8s)': Cycle(accelerator='SPS', name='ECN3_D (4.8s)', bps=9,
                         user='',power=52.83,filename=_source+'SFTPRO1_10point8.csv',
-                        coupled_cycle=PS_CYCLES['MTE (2 injections)']), 
+                        coupled_cycle=PS_CYCLES['MTE'], number_of_injections=2), 
     'ECN3_D (9.6s)': Cycle(accelerator='SPS', name='ECN3_D (9.6s)', bps=13,
                         user='',power=63.6,filename=_source+'SFTPRO1_15point6s_ESTIMATED.csv', # power from Hannes' values
-                        coupled_cycle=PS_CYCLES['MTE (2 injections)']), 
+                        coupled_cycle=PS_CYCLES['MTE'], number_of_injections=2), 
     'SFTPRO (1.2s)': Cycle(accelerator='SPS', name='SFTPRO (1.2s)', bps=6,
                         user='',power=34.88,filename=_source+'SFTPRO1_7point2s_ESTIMATED.csv', # power estimation is correct?
-                        coupled_cycle=PS_CYCLES['MTE (2 injections)']), 
+                        coupled_cycle=PS_CYCLES['MTE'], number_of_injections=2), 
     'SFTPRO (9.6s)': Cycle(accelerator='SPS', name='SFTPRO (9,6s)', bps=13,
                         user='',power=63.6,filename=_source+'SFTPRO1_15point6s_ESTIMATED.csv', # power from Hannes' values
-                        coupled_cycle=PS_CYCLES['MTE (2 injections)']), 
+                        coupled_cycle=PS_CYCLES['MTE'], number_of_injections=2), 
     'deGauss (3.6s)': Cycle(accelerator='SPS', name='deGauss (3.6s)', bps=3,
                             user='MD1',power=4.77,filename=_source+'MD1_deGauss_3point6s.csv'),
     'deGauss (10.8s)': Cycle(accelerator='SPS', name='deGauss (10.8s)', bps=9,
