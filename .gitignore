@@ -1,0 +1,8 @@
+*.html
+*.pdf
+*.exe
+.vscode/
+.idea/
+/tmp
+/temp
+__pycache__/
