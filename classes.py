@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from helpers import load_cycle_from_csv
 import constants as cnst
+import warnings
 
 
 class Cycle():
@@ -135,5 +136,7 @@ class SuperCycle():
         self.free_bps_per_supercycle = 0
         for cycle in self.cycles:
             self.free_bps_per_supercycle += cycle.bps - cycle.coupled_cycle_bps
-        if self.number_of_supercycles_played:
+        try:
             self.free_bps_total = self.free_bps_per_supercycle*self.number_of_supercycles_played
+        except:
+            warnings.warn('Number of supercycles played not calculated yet, needs to call allocate_hours method first.')
