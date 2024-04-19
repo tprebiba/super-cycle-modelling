@@ -143,7 +143,8 @@ class SuperCycle():
     
     def plot_supercycle(self,
                         fontsize=15, rotation=0, basic_period_tick=0.1,fig_length_scaling=0.3,
-                        show_accelerator_label=False, show_bp_label=True):
+                        show_accelerator_label=False, show_bp_label=True,
+                        cycle_name_position=0.8):
         """
         Plot the super cycle consisting of different accelerator cycles.
         """
@@ -166,9 +167,77 @@ class SuperCycle():
         x = 0
         for cycle in supercycle.cycles:
             ax.plot([x+shift, x+shift], [0,1], color='black', linewidth=lw) # left border of cycle
-            ax.text(x+shift+0.15, 0.8, cycle.name, fontsize=fontsize-3, color='black', rotation=rotation) # cycle name
+            ax.text(x+shift+0.15, cycle_name_position, cycle.name, fontsize=fontsize-3, color='black', rotation=rotation) # cycle name
             for i in range(cycle.bps):
-                ax.add_patch(plt.Rectangle((x+shift, 0), 1, 1, color=cnst.SPS_CYCLES_COLORS[cycle.name], alpha=0.8, linewidth=0))
+                ax.add_patch(plt.Rectangle((x+shift, 0), 1, 1, color=cnst.CYCLES_COLORS[cycle.name], alpha=0.8, linewidth=0))
+                ax.plot([x+shift, x+shift], [0,basic_period_tick], color='black', linewidth=lw) # basic period "tick"
+                x += 1
+            ax.plot([x+shift, x+shift], [0,1], color='black', linewidth=lw) # right border of cycle
+        ax.plot([x+shift, x+shift], [0,basic_period_tick], color='black', linewidth=lw) # last basic period "tick"
+        ax.plot([0+shift, x+shift], [0, 0], color='black', linewidth=lw) # bottom border of supercycle
+        ax.plot([0+shift, x+shift], [1, 1], color='black', linewidth=lw) # top border of supercycle
+        
+        ax.set_xlim(shift-0.1,x+shift+0.1)
+        ax.set_xticks(np.arange(1, x+1, 1))
+        if show_accelerator_label:
+            ax.set_ylabel(supercycle.accelerator, fontsize=fontsize, rotation=0)
+            ax.set_xlim(shift-0.8,x+shift+0.1)
+        ax.set_ylim(-0.02, 1.02)
+        
+        fig.tight_layout()
+        plt.show()
+
+    def make_coupled_supercycle(self):
+        '''
+        Makes a coupled supercycle
+        '''
+        coupled_cycles = []
+        for cycle in self.cycles:
+            free_bps = cycle.bps
+            if cycle.coupled_cycle is None:
+                pass
+            else:
+                for i in range(cycle.number_of_injections):
+                    coupled_cycles.append(cycle.coupled_cycle)
+                    free_bps -= cycle.coupled_cycle.bps
+                    injector_name = cycle.coupled_cycle.accelerator
+            if free_bps > 0:
+                for i in range(free_bps):
+                    coupled_cycles.append(cnst.ZERO_CYCLE)
+        self.coupled_supercycle = SuperCycle(injector_name, '', coupled_cycles) # this feels weird...
+
+    def plot_coupled_supercycle(self,
+                        fontsize=15, rotation=0, basic_period_tick=0.1,fig_length_scaling=0.3,
+                        show_accelerator_label=False, show_bp_label=True,
+                        cycle_name_position=0.8):
+        """
+        Plot the super cycle consisting of different accelerator cycles.
+        """
+        try:
+            supercycle = self.coupled_supercycle
+        except:
+            self.make_coupled_supercycle()
+            supercycle = self.coupled_supercycle
+        
+        fig, ax = plt.subplots(figsize=(supercycle.length*fig_length_scaling, 2.5))
+        lw=3
+        
+        if show_bp_label:
+            ax.set_xlabel('Basic periods', fontsize=fontsize)
+        ax.tick_params(axis='x', labelsize=fontsize, bottom=False)
+        ax.tick_params(axis='y', left=False, labelleft=False)
+        ax.spines['top'].set_visible(False)
+        ax.spines['bottom'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.spines['left'].set_visible(False)
+
+        shift = 0.5
+        x = 0
+        for cycle in supercycle.cycles:
+            ax.plot([x+shift, x+shift], [0,1], color='black', linewidth=lw) # left border of cycle
+            ax.text(x+shift+0.15, cycle_name_position, cycle.name, fontsize=fontsize-3, color='black', rotation=rotation) # cycle name
+            for i in range(cycle.bps):
+                ax.add_patch(plt.Rectangle((x+shift, 0), 1, 1, color=cnst.CYCLES_COLORS[cycle.name], alpha=0.8, linewidth=0))
                 ax.plot([x+shift, x+shift], [0,basic_period_tick], color='black', linewidth=lw) # basic period "tick"
                 x += 1
             ax.plot([x+shift, x+shift], [0,1], color='black', linewidth=lw) # right border of cycle

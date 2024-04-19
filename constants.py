@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 
 
 BASIC_PERIOD = 1.2 # [s]
+ZERO_CYCLE = Cycle(accelerator='', name='', bps=1)
 
 
 #######################################################
@@ -17,6 +18,7 @@ PSB_CYCLES = {
     'MTE': Cycle(accelerator='PSB', name='MTE', bps=1),
     'LHC': Cycle(accelerator='PSB', name='LHC', bps=1),
     'AWAKE': Cycle(accelerator='PSB', name='AWAKE', bps=1),
+    'Zero': Cycle(accelerator='PSB', name='', bps=1),
 }
 
 
@@ -42,6 +44,7 @@ PS_CYCLES = {
     'MD parallel': Cycle(accelerator='PS', name='MD parallel', bps=2),
     'Scrubbing': Cycle(accelerator='PS', name='Scrubbing', bps=3),
     'HiRadMat': Cycle(accelerator='PS', name='HiRadMat', bps=3),
+    'Zero': Cycle(accelerator='PS', name='Zero', bps=1),
                        
 }
 
@@ -157,16 +160,19 @@ SPS_CYCLES = {
     'SFTION4': Cycle(accelerator='SPS', name='SFTION4', bps=18,
                      user='', power=0.36)  # didn't find it, just copied SFTION2
 }
+
+
 _prop_cycle = plt.rcParams['axes.prop_cycle']
 _colors_list = _prop_cycle.by_key()['color']
-SPS_CYCLES_COLORS = {
-    'SFTPRO (1.2s)': _colors_list[0], 'SFTPRO (4.8s)': _colors_list[0], 'SFTPRO': _colors_list[0], 'SFTPRO (9.6s)': _colors_list[0], 'TCC2': _colors_list[0], 'SFTPRO2': _colors_list[0],
+CYCLES_COLORS = {
+    'SFTPRO (1.2s)': _colors_list[0], 'SFTPRO (4.8s)': _colors_list[0], 'SFTPRO': _colors_list[0], 'SFTPRO (9.6s)': _colors_list[0], 'TCC2': _colors_list[0], 'SFTPRO2': _colors_list[0], 'MTE': _colors_list[0], 'SFTPRO1': _colors_list[0],
     'LHC filling': _colors_list[1], 'LHC pilot': _colors_list[1], 'LHC': _colors_list[1], 'LHCINDIV': _colors_list[1], 'LHC1': _colors_list[1], 'LHC2': _colors_list[1], 'LHC3': _colors_list[1], 'LHC4': _colors_list[1], 'LHC50NS': _colors_list[1],
     'ECN3_D (1.2s)': _colors_list[2], 'ECN3_D (2.4s)': _colors_list[2], 'ECN3_D (4.8s)': _colors_list[2], 'ECN3_D (9.6s)': _colors_list[2], 'BDF/SHiP': _colors_list[2], 'SFTSHIP': _colors_list[2],
     'MD dedicated': _colors_list[3], 'MD parallel': _colors_list[3], 'Scrubbing': _colors_list[3], 'MD': _colors_list[3], 'MD2': _colors_list[3], 'MD3': _colors_list[3], 'MD4': _colors_list[3], 'LHCMD1': _colors_list[3], 'LHCMD2': _colors_list[3], 'LHCMD3': _colors_list[3], 'LHCMD4': _colors_list[3],
     'AWAKE': _colors_list[4], 'HiRadMat': _colors_list[4], 'HIRADMT1': _colors_list[4], 
     'Zero': _colors_list[5], 'deGauss (3.6s)': _colors_list[5], 'deGauss (10.8s)': _colors_list[5], 'deGauss': _colors_list[5],
-    'SFTION1': _colors_list[6], 'SFTION2': _colors_list[6], 'LHCION1': _colors_list[6], 'LHCION2': _colors_list[6], 'LHCION3': _colors_list[6], 'Ions': _colors_list[6], 'LHCION4': _colors_list[6], 'SFTION4': _colors_list[6]
+    'SFTION1': _colors_list[6], 'SFTION2': _colors_list[6], 'LHCION1': _colors_list[6], 'LHCION2': _colors_list[6], 'LHCION3': _colors_list[6], 'Ions': _colors_list[6], 'LHCION4': _colors_list[6], 'SFTION4': _colors_list[6],
+    '': 'white'
     
 }
 
