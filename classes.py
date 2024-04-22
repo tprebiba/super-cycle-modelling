@@ -254,3 +254,45 @@ class SuperCycle():
         
         fig.tight_layout()
         plt.show()
+
+
+class SuperCycleScheduler():
+    '''
+    A simple super cycle scheduler
+    Inputs:
+        - supercycles scenario
+        - supercycles time sharing in hours
+        - machine availability
+    '''
+    def __init__(self, supercycles_scenario, supercycles_time_sharing_hours, machine_availability=1):
+        self.supercycles_scenario = supercycles_scenario
+        self.supercycles_time_sharing_hours = supercycles_time_sharing_hours
+        self.machine_availability = machine_availability
+        
+        self.cycle_names = []
+        for supercycle in self.supercycles_scenario.values():
+            for cycle in supercycle.cycles:
+                self.cycle_names.append(cycle.name)
+        self.cycle_names = np.unique(self.cycle_names)
+    
+    def calculate_number_of_cycles(self):
+        
+        self.injector_total_bps = 0 # total BPs over the allocated time for the injector
+        self.injector_total_free_bps = 0 # total free BPs over the allocated time for the injector
+        self.number_of_cycles_played_total = {} # total number of cycles played over the allocated time
+        for cycle in self.cycle_names:
+            self.number_of_cycles_played_total[cycle] = 0
+
+        for supercycle in self.supercycles_scenario.values():
+            
+            supercycle.allocate_hours(self.supercycles_time_sharing_hours[supercycle.name], machine_availability=self.machine_availability)
+            supercycle.calculate_free_bps()
+
+            self.injector_total_bps += supercycle.allocated_bps
+            self.injector_total_free_bps += supercycle.free_bps_total
+
+            for cycle in self.cycle_names:
+                if cycle in supercycle.number_of_cycles_played.keys():
+                    self.number_of_cycles_played_total[cycle] += supercycle.number_of_cycles_played[cycle]
+
+        self.free_bps_percentage = self.injector_total_free_bps/self.injector_total_bps*100
