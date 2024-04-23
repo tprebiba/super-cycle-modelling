@@ -124,10 +124,15 @@ class SuperCycle():
         self.allocated_seconds = self.allocated_hours*60*60
         self.allocated_bps = self.allocated_seconds/cnst.BASIC_PERIOD
         self.number_of_supercycles_played = self.allocated_seconds/self.length
-        self.number_of_cycles_played = {}
+        
+        self.number_of_cycles_played = {} # number of times each cycle is played in the allocated time
         for cycle in np.unique(self.cycle_names):
             multiplicity = self.cycle_names.count(cycle)
             self.number_of_cycles_played[cycle] = self.number_of_supercycles_played*multiplicity
+
+        self.time_sharing_of_cycles = {} # time in seconds each cycle occupied in the allocated time
+        for cycle in self.cycles:
+            self.time_sharing_of_cycles[cycle.name] = cycle.length*self.number_of_cycles_played[cycle.name]
 
     def calculate_free_bps(self):
         '''
@@ -280,8 +285,10 @@ class SuperCycleScheduler():
         self.injector_total_bps = 0 # total BPs over the allocated time for the injector
         self.injector_total_free_bps = 0 # total free BPs over the allocated time for the injector
         self.number_of_cycles_played_total = {} # total number of cycles played over the allocated time
+        self.time_sharing_of_cycles_total = {} # total time in seconds each cycle occupied over the allocated time
         for cycle in self.cycle_names:
             self.number_of_cycles_played_total[cycle] = 0
+            self.time_sharing_of_cycles_total[cycle] = 0
 
         for supercycle in self.supercycles_scenario.values():
             
@@ -294,5 +301,60 @@ class SuperCycleScheduler():
             for cycle in self.cycle_names:
                 if cycle in supercycle.number_of_cycles_played.keys():
                     self.number_of_cycles_played_total[cycle] += supercycle.number_of_cycles_played[cycle]
+                    self.time_sharing_of_cycles_total[cycle] += supercycle.time_sharing_of_cycles[cycle]
 
         self.free_bps_percentage = self.injector_total_free_bps/self.injector_total_bps*100
+
+    def plot_cycles_time_sharing(self, toPlot='time', percentage=True,
+                                 fontsize=20,startangle=0,
+                                 savefig=False):
+        try:
+            number_of_cycles_played_total = self.number_of_cycles_played_total
+            time_sharing_of_cycles_total = self.time_sharing_of_cycles_total
+        except:
+            self.calculate_number_of_cycles()
+            number_of_cycles_played_total = self.number_of_cycles_played_total
+            time_sharing_of_cycles_total = self.time_sharing_of_cycles_total
+
+        if toPlot == 'time':
+            title = 'Time sharing of cycles '
+            labels = list(time_sharing_of_cycles_total.keys())
+            sizes = list(time_sharing_of_cycles_total.values())
+        elif toPlot == 'nr_of_cycles':
+            title = 'Number of cycles played '
+            labels = list(number_of_cycles_played_total.keys())
+            sizes = list(number_of_cycles_played_total.values())
+
+        def autopct_format(values):
+            def my_format(pct):
+                total = sum(values)
+                val = int(round(pct*total/100.0))
+                return '{v:d}'.format(v=val)
+            return my_format
+        if percentage:
+            autopct = '%1.1f%%'
+            title2='(%)'
+        else:
+            autopct = autopct_format(sizes)
+            title2=''
+
+        fig, ax = plt.subplots(figsize=(8, 8), facecolor='white')
+        ax.set_title(title+title2, fontsize=fontsize)
+        wedges, texts, autotexts = ax.pie(
+            sizes,
+            labels=labels,
+            autopct=autopct,
+            colors=np.array([cnst.CYCLES_COLORS[k] for k in labels]),
+            startangle=startangle,
+            textprops=dict(color="black", size=fontsize)  # Adjust the text properties
+        )
+        # Adjust the labels to be inside the pie chart
+        for text, autotext in zip(texts, autotexts):
+            text.set(size=fontsize)
+            autotext.set(size=fontsize)
+        ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+        fig.tight_layout()
+        
+        if savefig!=False:
+            print('Saving figure to %s.'%savefig)
+            fig.savefig(savefig, dpi=300)
