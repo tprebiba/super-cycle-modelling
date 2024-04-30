@@ -307,7 +307,7 @@ class SuperCycleScheduler():
 
     def plot_cycles_time_sharing(self, toPlot='time', percentage=True,
                                  fontsize=20,startangle=0,
-                                 savefig=False):
+                                 savefig=False,desired_order=None):
         try:
             number_of_cycles_played_total = self.number_of_cycles_played_total
             time_sharing_of_cycles_total = self.time_sharing_of_cycles_total
@@ -337,6 +337,11 @@ class SuperCycleScheduler():
         else:
             autopct = autopct_format(sizes)
             title2=''
+
+        if desired_order is not None:
+            combined = list(zip(labels, sizes))
+            combined_sorted = sorted(combined, key=lambda x: desired_order.index(x[0]))
+            labels, sizes = zip(*combined_sorted)
 
         fig, ax = plt.subplots(figsize=(8, 8), facecolor='white')
         ax.set_title(title+title2, fontsize=fontsize)
